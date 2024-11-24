@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Casa Abandonada</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div id="story-container">
+            <p id="story"></p>
+        </div>
+        <div id="choices" class="choices"></div>
+        <div id="score-container">
+            <p id="score">Puntos: 0</p>
+        </div>
+    </div>
+
+    <audio id="background-music" loop preload="auto">
+        <source src="background-music.mp3" type="audio/mp3">
+    </audio>
+    <audio id="scary-sound" preload="auto">
+        <source src="scary-sound.mp3" type="audio/mp3">
+    </audio>
+    
+    <script src="script.js"></script>
+</body>
+</html>
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #111;
+    color: white;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+    overflow: hidden;
+}
+
+.game-container {
+    width: 80%;
+    max-width: 600px;
+    margin: auto;
+}
+
+#story-container {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+#choices {
+    margin-top: 20px;
+}
+
+.choice-btn {
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 10px;
+    margin: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.choice-btn:hover {
+    background-color: #555;
+}
+
+#score-container {
+    margin-top: 30px;
+    font-size: 22px;
+}
+
+button:focus {
+    outline: none;
+}
+
+#background-music {
+    display: none;
+}
+
+// Variables globales
+let score = 0;
+let scarySound = document.getElementById("scary-sound");
+let backgroundMusic = document.getElementById("background-music");
+let storyText = document.getElementById("story");
+let choicesContainer = document.getElementById("choices");
+let scoreDisplay = document.getElementById("score");
+
+// Historia y ramificaciones
+let gameState = {
+    step: 0,
+    path: []
+};
+
+// Función para actualizar la historia y las opciones
+function updateStory() {
+    if (gameState.step === 0) {
+        storyText.innerHTML = "Te encuentras frente a una casa antigua. Las ventanas están rotas y la puerta parece estar cerrada. Sabes que debes entrar.";
+        choicesContainer.innerHTML = `
+            <button class="choice-btn" onclick="makeChoice(1)">Entrar por la puerta principal</button>
+            <button class="choice-btn" onclick="makeChoice(2)">Mirar alrededor de la casa</button>
+        `;
+    } else if (gameState.step === 1) {
+        storyText.innerHTML = "Entraste en la casa y la puerta se cerró detrás de ti. El aire es frío y el lugar huele a humedad. Un pasillo oscuro se extiende frente a ti.";
+        choicesContainer.innerHTML = `
+            <button class="choice-btn" onclick="makeChoice(3)">Explorar el pasillo</button>
+            <button class="choice-btn" onclick="makeChoice(4)">Mirar en la habitación a la derecha</button>
+        `;
+    } else if (gameState.step === 2) {
+        storyText.innerHTML = "Te acercas a la ventana y ves algo extraño moviéndose dentro de la casa. De repente, escuchas ruidos provenientes del interior.";
+        choicesContainer.innerHTML = `
+            <button class="choice-btn" onclick="makeChoice(5)">Entrar a investigar</button>
+            <button class="choice-btn" onclick="makeChoice(6)">Salir de la casa</button>
+        `;
+    } else if (gameState.step === 3) {
+        storyText.innerHTML = "Mientras exploras el pasillo, sientes una presencia detrás de ti. Giras y ves una sombra que desaparece rápidamente.";
+        choicesContainer.innerHTML = `
+            <button class="choice-btn" onclick="makeChoice(7)">Seguir la sombra</button>
+            <button class="choice-btn" onclick="makeChoice(8)">Ignorar y continuar</button>
+        `;
+    } else if (gameState.step === 4) {
+        storyText.innerHTML = "Entro en la habitación. Las paredes están cubiertas de moho. Algo se mueve en la oscuridad...";
+        choicesContainer.innerHTML = `
+            <button class="choice-btn" onclick="makeChoice(9)">Encender la lámpara</button>
+            <button class="choice-btn" onclick="makeChoice(10)">Volver a la entrada</button>
+        `;
+    }
+}
+
+// Función para manejar las decisiones del jugador
+function makeChoice(choice) {
+    gameState.path.push(choice);
+    if (choice === 1) {
+        gameState.step = 1;
+        score += 5;
+    } else if (choice === 2) {
+        gameState.step = 2;
+        score += 3;
+    } else if (choice === 3) {
+        gameState.step = 3;
+        score += 10;
+    } else if (choice === 4) {
+        gameState.step = 4;
+        score += 2;
+    } else if (choice === 5) {
+        gameState.step = 4;
+        score += 15;
+    } else if (choice === 6) {
+        gameState.step = 0; // Game Over
+        score -= 5;
+        scarySound.play();
+    } else if (choice === 7) {
+        gameState.step = 5;
+        score += 20;
+    } else if (choice === 8) {
+        gameState.step = 6; // Game Over
+        score -= 10;
+        scarySound.play();
+    } else if (choice === 9) {
+        gameState.step = 7; // Final good ending
+        score += 50;
+    } else if (choice === 10) {
+        gameState.step = 0;
+    }
+
+    scoreDisplay.innerText = `Puntos: ${score}`;
+    updateStory();
+}
+
+// Iniciar el juego
+backgroundMusic.play();
+updateStory();
